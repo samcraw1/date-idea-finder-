@@ -1,0 +1,30 @@
+{
+  "name": "date-idea-finder",
+  "version": "1.0.0",
+  "description": "ChatGPT App for finding date ideas using MCP",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc && npm run build:widget",
+    "build:widget": "esbuild src/web/widget.tsx --bundle --format=esm --outfile=dist/widget.js --loader:.tsx=tsx",
+    "start": "node dist/server.js",
+    "dev": "npm run build && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samcraw1/date-idea-finder-.git"
+  },
+  "keywords": ["chatgpt", "mcp", "date-ideas"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.5",
+    "dotenv": "^17.2.3",
+    "esbuild": "^0.27.2",
+    "express": "^5.2.1",
+    "typescript": "^5.9.3",
+    "zod": "^4.3.5"
+  }
+}
