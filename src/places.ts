@@ -23,11 +23,14 @@ export interface DatePlanResult {
   vibe: string;
   timeOfDay: string;
   budget: string;
+  stage: string;
+  wasSurprise?: boolean;
 }
 
 type Budget = "low" | "medium" | "high";
-type Vibe = "artsy" | "outdoorsy" | "foodie" | "chill" | "adventurous";
+type Vibe = "artsy" | "outdoorsy" | "foodie" | "chill" | "adventurous" | "romantic" | "sporty" | "nerdy" | "bougie" | "spontaneous";
 type TimeOfDay = "afternoon" | "evening" | "late night";
+type RelationshipStage = "first_date" | "established";
 
 // Map vibes to Google Places search types
 const vibeToPlaceTypes: Record<Vibe, string[]> = {
@@ -36,6 +39,11 @@ const vibeToPlaceTypes: Record<Vibe, string[]> = {
   foodie: ["restaurant", "cafe", "bakery", "bar"],
   chill: ["cafe", "spa", "park", "movie_theater"],
   adventurous: ["amusement_park", "bowling_alley", "escape_room", "rock_climbing"],
+  romantic: ["restaurant", "wine_bar", "spa", "botanical_garden"],
+  sporty: ["bowling_alley", "gym", "stadium", "sports_bar"],
+  nerdy: ["book_store", "cafe", "museum", "arcade"],
+  bougie: ["fine_dining", "spa", "wine_bar", "rooftop_bar"],
+  spontaneous: ["restaurant", "bar", "entertainment", "cafe"],
 };
 
 // Map budget to price levels
@@ -79,6 +87,31 @@ const outfitSuggestions: Record<Vibe, Record<TimeOfDay, string>> = {
     evening: "Smart adventure: dark jeans, a fitted jacket, versatile shoes that work for activities.",
     "late night": "Bold casual: something with personality - a statement jacket, interesting sneakers, confidence.",
   },
+  romantic: {
+    afternoon: "Classic charm: well-fitted chinos, a soft cashmere sweater, clean leather shoes. Understated elegance.",
+    evening: "Romance-ready: dark slacks, a crisp white shirt, blazer optional, polished shoes. Timeless and intentional.",
+    "late night": "Intimate vibes: dark fitted jeans, a nice knit sweater, cologne that lingers. Keep it close and cozy.",
+  },
+  sporty: {
+    afternoon: "Athletic chic: clean joggers or athletic shorts, a fitted performance tee, fresh sneakers.",
+    evening: "Sport casual: dark jeans, a team jersey or polo, clean sneakers. Comfortable but put-together.",
+    "late night": "Game night ready: fitted jeans, a casual button-down or henley, versatile sneakers.",
+  },
+  nerdy: {
+    afternoon: "Geek chic: well-fitted jeans, a subtle fandom tee or interesting graphic, clean sneakers.",
+    evening: "Smart casual: dark jeans, a button-down with subtle pattern, maybe glasses if you wear them.",
+    "late night": "Cozy intellectual: comfortable pants, a soft sweater or hoodie, casual shoes.",
+  },
+  bougie: {
+    afternoon: "Elevated everything: tailored chinos, designer tee or polo, loafers, nice watch. Quality over quantity.",
+    evening: "Main character energy: well-tailored suit or blazer combo, dress shoes, statement accessories.",
+    "late night": "After-hours luxury: dark designer jeans, cashmere sweater, leather shoes. Look like you belong in VIP.",
+  },
+  spontaneous: {
+    afternoon: "Ready for anything: versatile jeans, a layerable outfit, comfortable shoes that can walk or dance.",
+    evening: "Flexible style: dark jeans, a nice shirt that works anywhere, shoes you can move in.",
+    "late night": "Go-anywhere look: all-black base, add layers as needed, comfortable but stylish shoes.",
+  },
 };
 
 // Conversation starters based on vibe
@@ -118,6 +151,55 @@ const conversationStartersByVibe: Record<Vibe, string[]> = {
     "If you could learn any skill overnight, what would it be?",
     "What's a fear you've conquered or want to conquer?",
   ],
+  romantic: [
+    "What's the most romantic thing someone has done for you?",
+    "Do you believe in love at first sight?",
+    "What does your ideal weekend together look like?",
+    "What's a relationship green flag you always look for?",
+    "What's your love language?",
+  ],
+  sporty: [
+    "What sport could you watch all day?",
+    "Did you play any sports growing up?",
+    "What's your hot take sports opinion?",
+    "If you could have courtside seats to any game, what would it be?",
+    "Are you competitive or do you play for fun?",
+  ],
+  nerdy: [
+    "What's something you could talk about for hours?",
+    "What's your favorite fictional universe to escape into?",
+    "Are you a book-first or movie-first person?",
+    "What's a rabbit hole you've fallen down recently?",
+    "If you could master any skill from a video game, what would it be?",
+  ],
+  bougie: [
+    "What's the best luxury experience you've ever had?",
+    "If money was no object, where would you travel first?",
+    "What's something you think is worth splurging on?",
+    "Do you prefer experiences or things?",
+    "What's a taste you've acquired that surprised you?",
+  ],
+  spontaneous: [
+    "What's the craziest thing you've done on a whim?",
+    "If we left right now, where would you want to go?",
+    "Are you a planner or a go-with-the-flow person?",
+    "What's something you've always wanted to try but haven't yet?",
+    "Best unexpected adventure you've had?",
+  ],
+};
+
+// Stage-specific conversation additions
+const stageSpecificStarters: Record<RelationshipStage, string[]> = {
+  first_date: [
+    "What's something most people don't know about you?",
+    "What are you most passionate about right now?",
+    "What's your ideal way to spend a day off?",
+  ],
+  established: [
+    "What's something new you want us to try together?",
+    "What's a memory of us that always makes you smile?",
+    "Where should our next adventure be?",
+  ],
 };
 
 // End of night suggestions
@@ -128,6 +210,11 @@ const endOfNightMoves: Record<TimeOfDay, Record<Vibe, { type: string; suggestion
     foodie: { type: "dessert", suggestion: "Hit up that famous bakery or dessert bar you've been eyeing" },
     chill: { type: "walk", suggestion: "Grab coffee to-go and stroll through a nice neighborhood" },
     adventurous: { type: "activity", suggestion: "Extend the date with a quick arcade visit or mini golf" },
+    romantic: { type: "walk", suggestion: "Find a scenic overlook or garden for a quiet moment together" },
+    sporty: { type: "activity", suggestion: "Quick round of mini golf or batting cages nearby" },
+    nerdy: { type: "activity", suggestion: "Hit up a board game cafe or check out a cool bookstore" },
+    bougie: { type: "dessert", suggestion: "Upscale patisserie or champagne bar for something sweet" },
+    spontaneous: { type: "activity", suggestion: "Pick a random direction and explore - see what you find" },
   },
   evening: {
     artsy: { type: "bar", suggestion: "Find a speakeasy or cocktail bar with interesting decor" },
@@ -135,6 +222,11 @@ const endOfNightMoves: Record<TimeOfDay, Record<Vibe, { type: string; suggestion
     foodie: { type: "dessert", suggestion: "Upscale dessert bar or a wine bar with a cheese board" },
     chill: { type: "walk", suggestion: "Walk to a quiet spot and just talk - connection over activity" },
     adventurous: { type: "bar", suggestion: "Find a rooftop bar or somewhere with live music" },
+    romantic: { type: "walk", suggestion: "Find a quiet spot with a view - city lights or waterfront" },
+    sporty: { type: "bar", suggestion: "Sports bar with games on, or a place with pool tables" },
+    nerdy: { type: "activity", suggestion: "Late-night arcade or a bar with trivia night" },
+    bougie: { type: "bar", suggestion: "Rooftop cocktail bar or upscale wine lounge" },
+    spontaneous: { type: "bar", suggestion: "Walk until you find a place that looks interesting" },
   },
   "late night": {
     artsy: { type: "bar", suggestion: "Underground jazz bar or a late-night coffee shop with live poetry" },
@@ -142,6 +234,11 @@ const endOfNightMoves: Record<TimeOfDay, Record<Vibe, { type: string; suggestion
     foodie: { type: "food", suggestion: "Late-night taco spot or a 24-hour diner for a nightcap meal" },
     chill: { type: "walk", suggestion: "Quiet late-night walk, maybe grab a slice of pizza" },
     adventurous: { type: "activity", suggestion: "Late-night bowling, karaoke, or dancing" },
+    romantic: { type: "walk", suggestion: "Late-night stroll somewhere beautiful - beach, park, or city view" },
+    sporty: { type: "activity", suggestion: "24-hour bowling alley or late-night batting cages" },
+    nerdy: { type: "food", suggestion: "24-hour diner to keep talking, or a late-night boba spot" },
+    bougie: { type: "bar", suggestion: "Members club or hotel bar with craft cocktails" },
+    spontaneous: { type: "activity", suggestion: "Whatever's still open - let the night decide" },
   },
 };
 
@@ -211,6 +308,11 @@ function generateWhyItFits(place: any, vibe: Vibe, timeOfDay: TimeOfDay): string
     foodie: "exceptional food and culinary experience",
     chill: "relaxed ambiance perfect for conversation",
     adventurous: "exciting activities and memorable experiences",
+    romantic: "intimate setting perfect for connection",
+    sporty: "fun competitive energy and games",
+    nerdy: "cool geeky vibes and shared interests",
+    bougie: "upscale atmosphere and refined experience",
+    spontaneous: "versatile spot that goes with the flow",
   };
 
   const timeDescriptions: Record<TimeOfDay, string> = {
@@ -256,6 +358,31 @@ function generateFallbackVenues(
       backup: { name: `Urban Escape Rooms`, types: ["escape_room", "entertainment"] },
       endSpot: { name: `Rooftop Games Bar`, types: ["bar", "entertainment"] },
     },
+    romantic: {
+      primary: { name: `The Rose Garden Restaurant`, types: ["restaurant", "romantic"] },
+      backup: { name: `Candlelight Wine Bar`, types: ["wine_bar", "romantic"] },
+      endSpot: { name: `Starlight Terrace`, types: ["bar", "rooftop"] },
+    },
+    sporty: {
+      primary: { name: `${city} Sports Grill`, types: ["sports_bar", "restaurant"] },
+      backup: { name: `Strike Zone Bowling`, types: ["bowling_alley", "entertainment"] },
+      endSpot: { name: `Victory Lap Bar`, types: ["bar", "sports_bar"] },
+    },
+    nerdy: {
+      primary: { name: `The Dragon's Lair Game Cafe`, types: ["cafe", "game_store"] },
+      backup: { name: `Pixel Arcade Bar`, types: ["arcade", "bar"] },
+      endSpot: { name: `The Bookworm's Haven`, types: ["book_store", "cafe"] },
+    },
+    bougie: {
+      primary: { name: `${city} Grand Steakhouse`, types: ["fine_dining", "steakhouse"] },
+      backup: { name: `The Champagne Room`, types: ["wine_bar", "lounge"] },
+      endSpot: { name: `Sky Lounge Rooftop`, types: ["bar", "rooftop"] },
+    },
+    spontaneous: {
+      primary: { name: `${city} Food Hall`, types: ["food_court", "restaurant"] },
+      backup: { name: `The Corner Pub`, types: ["bar", "pub"] },
+      endSpot: { name: `Night Market ${city}`, types: ["market", "entertainment"] },
+    },
   };
 
   const priceLevel = budget === "low" ? 1 : budget === "medium" ? 2 : 3;
@@ -284,7 +411,9 @@ export function generateDatePlan(
   city: string,
   budget: Budget,
   vibe: Vibe,
-  timeOfDay: TimeOfDay
+  timeOfDay: TimeOfDay,
+  stage: RelationshipStage = "first_date",
+  wasSurprise: boolean = false
 ): DatePlanResult {
   const primarySpot = spots[0];
   const backupOption = spots[1] || spots[0];
@@ -293,10 +422,12 @@ export function generateDatePlan(
   // Get outfit suggestion
   const outfitSuggestion = outfitSuggestions[vibe][timeOfDay];
 
-  // Get conversation starters (pick 3 random ones)
-  const allStarters = conversationStartersByVibe[vibe];
-  const shuffled = [...allStarters].sort(() => Math.random() - 0.5);
-  const conversationStarters = shuffled.slice(0, 3);
+  // Get conversation starters (pick 2 from vibe + 1 from stage)
+  const vibeStarters = conversationStartersByVibe[vibe];
+  const stageStarters = stageSpecificStarters[stage];
+  const shuffledVibe = [...vibeStarters].sort(() => Math.random() - 0.5);
+  const shuffledStage = [...stageStarters].sort(() => Math.random() - 0.5);
+  const conversationStarters = [...shuffledVibe.slice(0, 2), shuffledStage[0]];
 
   // Get end of night move
   const endMove = endOfNightMoves[timeOfDay][vibe];
@@ -315,5 +446,7 @@ export function generateDatePlan(
     vibe,
     timeOfDay,
     budget,
+    stage,
+    wasSurprise,
   };
 }

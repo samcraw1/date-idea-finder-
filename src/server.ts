@@ -64,26 +64,36 @@ server.resource(
 const PlanDateInput = z.object({
   city: z.string().describe("The city where the date will take place"),
   budget: z.enum(["low", "medium", "high"]).describe("Budget level for the date"),
-  vibe: z.enum(["artsy", "outdoorsy", "foodie", "chill", "adventurous"]).describe("The vibe/atmosphere desired"),
+  vibe: z.enum(["artsy", "outdoorsy", "foodie", "chill", "adventurous", "romantic", "sporty", "nerdy", "bougie", "spontaneous", "surprise"]).describe("The vibe/atmosphere desired. Use 'surprise' for a random vibe."),
   timeOfDay: z.enum(["afternoon", "evening", "late night"]).describe("Time of day for the date"),
+  stage: z.enum(["first_date", "established"]).optional().describe("Relationship stage - affects recommendations and conversation starters"),
 });
 
 type PlanDateInputType = z.infer<typeof PlanDateInput>;
 
+// All available vibes for random selection
+const allVibes = ["artsy", "outdoorsy", "foodie", "chill", "adventurous", "romantic", "sporty", "nerdy", "bougie", "spontaneous"] as const;
+
 // Register the planDate tool
 server.tool(
   "planDate",
-  "Plan a perfect date based on city, budget, vibe, and time of day. Returns venue recommendations, outfit suggestions, and conversation starters.",
+  "Plan a perfect date based on city, budget, vibe, and time of day. Returns venue recommendations, outfit suggestions, and conversation starters. Supports relationship stages (first_date or established) for tailored suggestions.",
   PlanDateInput.shape,
-  async ({ city, budget, vibe, timeOfDay }: PlanDateInputType) => {
-    console.log(`Planning date: ${city}, ${budget}, ${vibe}, ${timeOfDay}`);
+  async ({ city, budget, vibe, timeOfDay, stage }: PlanDateInputType) => {
+    // Handle "surprise" vibe - pick a random one
+    const actualVibe = vibe === "surprise"
+      ? allVibes[Math.floor(Math.random() * allVibes.length)]
+      : vibe;
+
+    const relationshipStage = stage || "first_date";
+    console.log(`Planning date: ${city}, ${budget}, ${actualVibe}${vibe === "surprise" ? " (surprise!)" : ""}, ${timeOfDay}, ${relationshipStage}`);
 
     try {
       // Fetch real venue data from Google Places API
-      const spots = await fetchDateSpots(city, budget, vibe, timeOfDay);
+      const spots = await fetchDateSpots(city, budget, actualVibe, timeOfDay);
 
       // Generate complete date plan
-      const datePlan = generateDatePlan(spots, city, budget, vibe, timeOfDay);
+      const datePlan = generateDatePlan(spots, city, budget, actualVibe, timeOfDay, relationshipStage, vibe === "surprise");
 
       // Convert to plain object with index signature
       const structuredOutput: Record<string, unknown> = { ...datePlan };
